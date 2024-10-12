@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Cake Shop</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; }
+        header { text-align: center; background-color: #ff4757; color: white; padding: 20px; }
+        nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+        #cart { max-width: 800px; margin: 20px auto; text-align: center; }
+        .cake-card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .cake-card img { width: 80px; height: 80px; border-radius: 5px; object-fit: cover; }
+        .cake-info { text-align: left; flex-grow: 1; margin-left: 20px; }
+        .cake-info h3 { margin: 0; color: #333; }
+        .price, .total { font-weight: bold; color: #ff4757; }
+        button { background-color: #ff4757; border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #ff6b81; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Your Cart</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="cakes.html">Cakes</a>
+            <a href="carts.html">Cart</a>
+        </nav>
+    </header>
+
+    <section id="cart">
+        <div id="cart-items"></div>
+        <div id="total-price" style="font-weight: bold; margin-top: 20px;"></div>
+    </section>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+        const cartItemsDiv = document.getElementById('cart-items');
+        const totalPriceDiv = document.getElementById('total-price');
+
+        function updateCart() {
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p>No items in your cart.</p>';
+                totalPriceDiv.innerHTML = '';  // Clear total price when cart is empty
+            } else {
+                cartItemsDiv.innerHTML = cart.map((cake, index) => `
+                    <div class="cake-card">
+                        <img src="${cake.image}" alt="${cake.name}">
+                        <div class="cake-info">
+                            <h3>${cake.name}</h3>
+                            <p class="price">$${cake.price.toFixed(2)}</p>
+                            <p>Quantity: <span id="quantity-${index}">${cake.quantity}</span></p>
+                            <p class="total">Total: $<span id="total-${index}">${(cake.price * cake.quantity).toFixed(2)}</span></p>
+                        </div>
+                        <div>
+                            <button onclick="changeQuantity(${index}, -1)">-</button>
+                            <button onclick="changeQuantity(${index}, 1)">+</button>
+                            <button onclick="removeItem(${index})">Remove</button>
+                        </div>
+                    </div>
+                `).join('');
+
+                updateTotalPrice();
+            }
+        }
+
+        function updateTotalPrice() {
+            const total = cart.reduce((acc, cake) => acc + (cake.price * cake.quantity), 0);
+            totalPriceDiv.innerHTML = `Total Price: $${total.toFixed(2)}`;
+        }
+
+        function changeQuantity(index, delta) {
+            const newQuantity = Math.max(1, cart[index].quantity + delta);
+            cart[index].quantity = newQuantity;
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+
+            // Update the quantity display and the total price for this item
+            document.getElementById(`quantity-${index}`).textContent = newQuantity;
+            document.getElementById(`total-${index}`).textContent = (cart[index].price * newQuantity).toFixed(2);
+            updateTotalPrice();  // Update the overall total price
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cartItems', JSON.stringify(cart));
+            updateCart();
+        }
+
+        window.onload = updateCart;
+    </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cakes - Cake Shop</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f7f7f7; }
+        header { text-align: center; background: #ff4757; color: white; padding: 20px; border-radius: 10px; }
+        nav a { margin: 0 15px; color: white; text-decoration: none; }
+        #cakes { display: flex; flex-wrap: wrap; justify-content: space-around; margin-top: 20px; }
+        .cake-card { background: white; width: 220px; padding: 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+        .cake-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; }
+        .cake-card h3 { margin: 15px 0; }
+        .price { color: #ff4757; font-weight: bold; }
+        .quantity, button { margin: 10px 0; }
+        button { padding: 5px 10px; background: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        footer { text-align: center; margin-top: 30px; font-size: 0.9rem; color: #888; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Just Bake</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="cakes.html">Cakes</a>
+            <a href="carts.html">Cart</a>
+        </nav>
+    </header>
+
+    <section id="cakes">
+        <div class="cake-card">
+            <img src="https://png.pngtree.com/background/20230610/original/pngtree-chocolate-cake-in-britain-to-impress-your-date-picture-image_3020639.jpg" alt="Chocolate Cake">
+            <h3>Chocolate Cake</h3>
+            <p class="price">$20</p>
+            <div class="quantity">
+                <button class="decrease">-</button>
+                <span class="amount">1</span>
+                <button class="increase">+</button>
+            </div>
+            <p>Total Price: $<span class="total-price">20</span></p>
+            <button class="add-to-cart" data-name="Chocolate Cake" data-price="20">Add to Cart</button>
+        </div>
+
+        <div class="cake-card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSldf-LgnL3a-zE3oNCHE0eu0NXvaatfB57KQ&s" alt="Black Forest Cake">
+            <h3>Black Forest Cake</h3>
+            <p class="price">$25</p>
+            <div class="quantity">
+                <button class="decrease">-</button>
+                <span class="amount">1</span>
+                <button class="increase">+</button>
+            </div>
+            <p>Total Price: $<span class="total-price">25</span></p>
+            <button class="add-to-cart" data-name="Black Forest Cake" data-price="25">Add to Cart</button>
+        </div>
+
+        <div class="cake-card">
+            <img src="https://justbakedcake.com/wp-content/uploads/2020/09/SB-Cake-scaled.jpg" alt="Strawberry Cake">
+            <h3>Strawberry Cake</h3>
+            <p class="price">$125</p>
+            <div class="quantity">
+                <button class="decrease">-</button>
+                <span class="amount">1</span>
+                <button class="increase">+</button>
+            </div>
+            <p>Total Price: $<span class="total-price">125</span></p>
+            <button class="add-to-cart" data-name="Strawberry Cake" data-price="125">Add to Cart</button>
+        </div>
+
+        <div class="cake-card">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzNkQfGw5CPMhdIKN3_cNnaTZrF_Jqx-LMlw&s" alt="Red Velvet Cake">
+            <h3>Red Velvet Cake</h3>
+            <p class="price">$750</p>
+            <div class="quantity">
+                <button class="decrease">-</button>
+                <span class="amount">1</span>
+                <button class="increase">+</button>
+            </div>
+            <p>Total Price: $<span class="total-price">750</span></p>
+            <button class="add-to-cart" data-name="Red Velvet Cake" data-price="750">Add to Cart</button>
+        </div>
+    </section>
+
+    <footer>
+        &copy; 2024 Just Bake. All Rights Reserved.
+    </footer>
+
+    <script>
+        // Get all cake cards
+        const cakeCards = document.querySelectorAll('.cake-card');
+
+        cakeCards.forEach(card => {
+            const increaseButton = card.querySelector('.increase');
+            const decreaseButton = card.querySelector('.decrease');
+            const amountDisplay = card.querySelector('.amount');
+            const totalPriceDisplay = card.querySelector('.total-price');
+            const addToCartButton = card.querySelector('.add-to-cart');
+            const price = parseFloat(card.querySelector('.price').textContent.replace('$', ''));
+
+            // Initialize quantity to 1
+            let quantity = 1;
+
+            // Event listener for increase button
+            increaseButton.addEventListener('click', () => {
+                quantity++;
+                amountDisplay.textContent = quantity;
+                totalPriceDisplay.textContent = (quantity * price).toFixed(2);
+            });
+
+            // Event listener for decrease button
+            decreaseButton.addEventListener('click', () => {
+                if (quantity > 1) {
+                    quantity--;
+                    amountDisplay.textContent = quantity;
+                    totalPriceDisplay.textContent = (quantity * price).toFixed(2);
+                }
+            });
+
+            // Event listener for add to cart button
+            addToCartButton.addEventListener('click', () => {
+                const cakeData = {
+                    name: addToCartButton.dataset.name,
+                    price: price,
+                    quantity: quantity,
+                    image: card.querySelector('img').src
+                };
+
+                // Get existing cart items from local storage
+                const cart = JSON.parse(localStorage.getItem('cartItems')) || [];
+                const existingItemIndex = cart.findIndex(item => item.name === cakeData.name);
+
+                // If the item already exists in the cart, update the quantity
+                if (existingItemIndex > -1) {
+                    cart[existingItemIndex].quantity += quantity;
+                } else {
+                    // Otherwise, add the new item to the cart
+                    cart.push(cakeData);
+                }
+
+                // Save the updated cart back to local storage
+                localStorage.setItem('cartItems', JSON.stringify(cart));
+
+                // Reset quantity for the UI
+                quantity = 1;
+                amountDisplay.textContent = quantity;
+                totalPriceDisplay.textContent = (quantity * price).toFixed(2);
+            });
+        });
+    </script>
+</body>
+</html>
